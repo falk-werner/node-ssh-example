@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>SSH Test</title>
+    <link rel="stylesheet" href="index.css" />
+    <script type="text/javascript">
+
+      function startup() {
+        document.querySelector("#execButton").addEventListener("click", ssh_exec, false);
+        document.querySelector("#uploadButton").addEventListener("click", ssh_upload, false);
+        document.querySelector("#openFileButton").addEventListener("click", openFile, false);      }
+
+      async function ssh_exec() {
+        const hostname = document.querySelector("#hostname").value;
+        const username = document.querySelector("#username").value;
+        const password = document.querySelector("#password").value;
+        const command  = document.querySelector("#command").value;
+
+        const result = await ssh.exec(hostname, username, password, command);
+        
+        document.querySelector("#stdout").textContent = result.stdout;
+      }
+
+      async function ssh_upload() {
+        const hostname = document.querySelector("#hostname").value;
+        const username = document.querySelector("#username").value;
+        const password = document.querySelector("#password").value;
+        const localFile = document.querySelector("#localFile").value;
+        const remoteFile = document.querySelector("#remoteFile").value;
+
+        await ssh.upload(hostname, username, password, localFile, remoteFile);
+        console.log("uploaded");
+      }
+
+      async function openFile() {
+        const result = await dialog.openFile();
+        if (result.length > 0) {
+          document.querySelector("#localFile").value = result[0];
+        }
+      }
+
+    </script>
+  </head>
+  <body onload="startup()">
+    <h1>Connection</h1>
+    <div>
+      <label for="hostname">Hostname:</label>
+      <input type="text" id="hostname" value="192.168.42.42" />
+    </div>
+    <div>
+      <label for="username">Username:</label>
+      <input type="text" id="username" value="root" />
+    </div>
+    <div>
+      <label for="password">Password:</label>
+      <input type="password" id="password" value="wago" />
+    </div>
+    <h1>Run SSH Command</h1>
+    <div>
+      <label for="command">Command:</label>
+      <input type="text" id="command" value="ls -lah /" />
+    </div>
+    <div>
+      <input type="button" id="execButton" value="Execute"/>
+    </div>
+    <div>
+      <textarea id="stdout"></textarea>
+    </div>
+    <h1>Upload File</h1>
+    <div>
+      <label for="localFile">Local File:</label>
+      <input type="text" id="localFile" value="/tmp/test.txt" />
+      <input type="button" id="openFileButton" value="Choose" />
+    </div>
+    <div>
+      <label for="remoteFile">Remote File:</label>
+      <input type="text" id="remoteFile" value="/tmp/test.txt" />
+    </div>
+    <div>
+      <input type="button" id="uploadButton" value="Upload"/>
+    </div>
+  </body>
+</html>
